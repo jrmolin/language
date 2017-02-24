@@ -78,6 +78,10 @@ getTokenName(token_type_t tokenType)
             result = "QUOTEDSTRING";
             break;
 
+        case ASSIGN:
+            result = "ASSIGN";
+            break;
+
         default:
             result = "INVALID";
             break;

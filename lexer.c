@@ -66,6 +66,23 @@ void __getNumber(
 }
 
 
+int __validIdentifierChar(char c, int first)
+{
+    int result = 0;
+
+    if(('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('_' == c))
+    {
+        result = 1;
+    }
+
+    if (!first && ('0' <= c && c <= '9'))
+    {
+        result = 1;
+    }
+
+    return result;
+}
+
 token_t * __getNextToken(scanner_t *scanner)
 {
     token_t *result = NULL;
@@ -100,7 +117,7 @@ token_t * __getNextToken(scanner_t *scanner)
             __getNumber(&(scanner->input[index]), remaining, &tmp);
             saveAndBreak = 1;
         }
-        else if('+' == c || '-' == c || '*' == c || '/' == c)
+        else if('+' == c || '-' == c || '*' == c || '/' == c || '=' == c)
         {
             tmp.length = 1;
             tmp.value.cstr = &(scanner->input[index]);
@@ -120,6 +137,10 @@ token_t * __getNextToken(scanner_t *scanner)
 
                 case '/':
                     tmp.type = DIVIDE;
+                    break;
+
+                case '=':
+                    tmp.type = ASSIGN;
                     break;
                 default:
                     break;
@@ -155,6 +176,27 @@ token_t * __getNextToken(scanner_t *scanner)
                 }
             }
 
+            saveAndBreak = 1;
+        }
+        else if(__validIdentifierChar(c, 1))
+        {
+            tmp.type = IDENTIFIER;
+            tmp.value.cstr = &(scanner->input[index]);
+
+            for (size_t i = index + 1; i < scanner->length; ++i)
+            {
+                c = scanner->input[i];
+
+                if (!__validIdentifierChar(c, 0))
+                {
+                    printf("invalid character = [%#x]\n", c);
+                    tmp.length = i - index;
+                    break;
+                }
+
+            }
+
+            printf("identifier [%.*s]\n", tmp.length, tmp.value.cstr);
             saveAndBreak = 1;
         }
         else

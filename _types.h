@@ -52,6 +52,7 @@ typedef enum
    IDENTIFIER,
    DEF,
    QUOTEDSTRING,
+   ASSIGN,
 } token_type_t;
 
 struct _token_t
