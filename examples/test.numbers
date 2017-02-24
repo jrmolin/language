@@ -1,0 +1,25 @@
+
+   12
+012
+0x12
+
+33
+42 + 5
+
+"this is a string"
+
+"this is a string
+with a break in it\n
+and nested backslashes\\\"
+
+help!"
+
+someIdentifier = 234
+otherIdentifer23423=23
+
+someIdentifier += 23
+otherIdentifer23423++
+var array = []
+array[1] = 23
+array[3] = "something else"
+array[5] = {}

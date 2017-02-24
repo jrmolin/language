@@ -83,6 +83,42 @@ int __validIdentifierChar(char c, int first)
     return result;
 }
 
+int is_op(char c)
+{
+    int result = 0;
+    if ('+' == c
+        || '-' == c
+        || '*' == c
+        || '/' == c
+        || '=' == c
+       )
+    {
+        result = 1;
+    }
+
+    return result;
+}
+
+int is_symbol(char c)
+{
+    int result = 0;
+    if ('(' == c
+        || ')' == c
+        || '{' == c
+        || '}' == c
+        || '[' == c
+        || ']' == c
+        || '^' == c
+        || '&' == c
+        || '%' == c
+       )
+    {
+        result = 1;
+    }
+
+    return result;
+}
+
 token_t * __getNextToken(scanner_t *scanner)
 {
     token_t *result = NULL;
@@ -117,7 +153,7 @@ token_t * __getNextToken(scanner_t *scanner)
             __getNumber(&(scanner->input[index]), remaining, &tmp);
             saveAndBreak = 1;
         }
-        else if('+' == c || '-' == c || '*' == c || '/' == c || '=' == c)
+        else if(is_op(c))
         {
             tmp.length = 1;
             tmp.value.cstr = &(scanner->input[index]);
@@ -142,6 +178,42 @@ token_t * __getNextToken(scanner_t *scanner)
                 case '=':
                     tmp.type = ASSIGN;
                     break;
+                default:
+                    break;
+            }
+
+            saveAndBreak = 1;
+        }
+        else if(is_symbol(c))
+        {
+            tmp.length = 1;
+            tmp.value.cstr = &(scanner->input[index]);
+            switch(c)
+            {
+                case '(':
+                    tmp.type = LPAREN;
+                    break;
+
+                case ')':
+                    tmp.type = RPAREN;
+                    break;
+
+                case '{':
+                    tmp.type = LCURLY;
+                    break;
+
+                case '}':
+                    tmp.type = RCURLY;
+                    break;
+
+                case '[':
+                    tmp.type = LSQUARE;
+                    break;
+
+                case ']':
+                    tmp.type = RSQUARE;
+                    break;
+
                 default:
                     break;
             }
@@ -189,7 +261,7 @@ token_t * __getNextToken(scanner_t *scanner)
 
                 if (!__validIdentifierChar(c, 0))
                 {
-                    printf("invalid character = [%#x]\n", c);
+                    printf("invalid character = [%.1s]\n", scanner->input + i);
                     tmp.length = i - index;
                     break;
                 }

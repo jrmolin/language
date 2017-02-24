@@ -58,6 +58,22 @@ getTokenName(token_type_t tokenType)
             result = "DIVIDE";
             break;
 
+        case LCURLY:
+            result = "LCURLY";
+            break;
+
+        case RCURLY:
+            result = "RCURLY";
+            break;
+
+        case LSQUARE:
+            result = "LSQUARE";
+            break;
+
+        case RSQUARE:
+            result = "RSQUARE";
+            break;
+
         case LPAREN:
             result = "LPAREN";
             break;
