@@ -43,10 +43,7 @@ typedef token_t * (*NextTokenFunction)(scanner_t *);
 typedef enum
 {
    NUMBER = 0,
-   PLUS,
-   MINUS,
-   TIMES,
-   DIVIDE,
+   OPERATOR,
    LPAREN,
    RPAREN,
    LCURLY,
@@ -58,6 +55,14 @@ typedef enum
    QUOTEDSTRING,
    ASSIGN,
 } token_type_t;
+
+typedef enum
+{
+    PLUS,
+    MINUS,
+    TIMES,
+    DIVIDE,
+} operator_kind_t;
 
 struct _token_t
 {
@@ -75,7 +80,10 @@ struct _token_t
         uint64_t u64;
         const char *cstr;
         void *vptr;
+        operator_kind_t kind;
     } value;
+
+    const char *string;
 
     size_t lineno;  // line number of this token
     size_t offset;  // byte offset into the file (ascii only for now)

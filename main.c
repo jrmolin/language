@@ -4,8 +4,6 @@
 #include "lexer.h"
 #include "utils.h"
 
-#include "macros.h"
-
 int main(int argc, char **argv)
 {
     int result = 0;
@@ -14,10 +12,6 @@ int main(int argc, char **argv)
     if (2 > argc)
     {
         printf("usage: %s <file>\n", *argv);
-        printf(EVAL(JOIN_STRINGS("\n",
-            "usage: %s <file>",
-            "this is used to do things that are neat",
-            "last line here")) "\n", *argv);
         goto Cleanup;
     }
 
@@ -32,8 +26,7 @@ int main(int argc, char **argv)
 
             if (ValidPtr(token))
             {
-                printf("[%s] [%lu] [%.*s]\n", getTokenName(token->type), token->value.u64,
-                    token->length, &(scanner->input[token->offset]));
+                printToken(1, token);
             }
             else
             {
@@ -45,6 +38,5 @@ int main(int argc, char **argv)
     }
 
 Cleanup:
-    printf(EVAL(GREET(JOIN_STRINGS(", ", "Mum", "Dad", "Adam", "Joe"))));
     return result;
 }

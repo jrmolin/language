@@ -17,19 +17,7 @@ const char *__input = "(defn hello () (str \"hello, \" \"world!\"))";
  *
  */
 
-typedef enum
-{
-    STATE_INVALID = -1,
-    STATE_WHITESPACE = 0,
-    STATE_STRING,
-    STATE_OCTAL,
-    STATE_HEXADECIMAL,
-    STATE_DECIMAL,
-    STATE_IDENTIFIER,
-    STATE_EOT,
-} eState;
-
-void __skipWhiteSpace(scanner_t *scanner)
+static void __skipWhiteSpace(scanner_t *scanner)
 {
     if (ValidPtr(scanner))
     {
@@ -90,7 +78,6 @@ int is_op(char c)
         || '-' == c
         || '*' == c
         || '/' == c
-        || '=' == c
        )
     {
         result = 1;
@@ -111,6 +98,7 @@ int is_symbol(char c)
         || '^' == c
         || '&' == c
         || '%' == c
+        || '=' == c
        )
     {
         result = 1;
@@ -119,11 +107,35 @@ int is_symbol(char c)
     return result;
 }
 
+void printToken(int fd, token_t *token)
+{
+    const char *name = getTokenName(token->type);
+
+    dprintf(fd, "[%s]:", name);
+
+    switch(token->type)
+    {
+        case NUMBER:
+            dprintf(fd, " [%lu] ",token->value.u64);
+            break;
+
+        case OPERATOR:
+            dprintf(fd, " [%s] ", getOperatorName(token->value.kind));
+            break;
+
+        default:
+            dprintf(fd, " [%.*s] ", token->length, token->value.cstr);
+            break;
+    }
+
+    // dprintf(fd, fmt, ...);
+    dprintf(fd, " [%.*s]\n", token->length, token->string);
+}
+
 token_t * __getNextToken(scanner_t *scanner)
 {
     token_t *result = NULL;
     token_t tmp = {0,};
-    eState state = STATE_INVALID;
     size_t index = 0;
     size_t remaining = 0;
 
@@ -156,28 +168,26 @@ token_t * __getNextToken(scanner_t *scanner)
         else if(is_op(c))
         {
             tmp.length = 1;
-            tmp.value.cstr = &(scanner->input[index]);
+            tmp.string = &(scanner->input[index]);
+            tmp.type = OPERATOR;
             switch(c)
             {
                 case '+':
-                    tmp.type = PLUS;
+                    tmp.value.kind = PLUS;
                     break;
 
                 case '-':
-                    tmp.type = MINUS;
+                    tmp.value.kind = MINUS;
                     break;
 
                 case '*':
-                    tmp.type = TIMES;
+                    tmp.value.kind = TIMES;
                     break;
 
                 case '/':
-                    tmp.type = DIVIDE;
+                    tmp.value.kind = DIVIDE;
                     break;
 
-                case '=':
-                    tmp.type = ASSIGN;
-                    break;
                 default:
                     break;
             }
@@ -187,7 +197,7 @@ token_t * __getNextToken(scanner_t *scanner)
         else if(is_symbol(c))
         {
             tmp.length = 1;
-            tmp.value.cstr = &(scanner->input[index]);
+            tmp.string = &(scanner->input[index]);
             switch(c)
             {
                 case '(':
@@ -214,6 +224,10 @@ token_t * __getNextToken(scanner_t *scanner)
                     tmp.type = RSQUARE;
                     break;
 
+                case '=':
+                    tmp.type = ASSIGN;
+                    break;
+
                 default:
                     break;
             }
@@ -224,7 +238,7 @@ token_t * __getNextToken(scanner_t *scanner)
         {
             tmp.type = QUOTEDSTRING;
             int escapeToggle = 0;
-            tmp.value.cstr = &(scanner->input[index]);
+            tmp.value.cstr = tmp.string = &(scanner->input[index]);
 
             for (size_t i = index + 1; i < scanner->length; ++i)
             {
@@ -253,7 +267,7 @@ token_t * __getNextToken(scanner_t *scanner)
         else if(__validIdentifierChar(c, 1))
         {
             tmp.type = IDENTIFIER;
-            tmp.value.cstr = &(scanner->input[index]);
+            tmp.value.cstr = tmp.string = &(scanner->input[index]);
 
             for (size_t i = index + 1; i < scanner->length; ++i)
             {

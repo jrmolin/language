@@ -32,6 +32,36 @@ Cleanup:
 }
 
 const char *
+getOperatorName(operator_kind_t op)
+{
+    const char *result = "UNKNOWN";
+
+    switch(op)
+    {
+        case PLUS:
+            result = "PLUS";
+            break;
+
+        case TIMES:
+            result = "TIMES";
+            break;
+
+        case MINUS:
+            result = "MINUS";
+            break;
+
+        case DIVIDE:
+            result = "DIVIDE";
+            break;
+
+        default:
+            result = "INVALID";
+            break;
+    }
+
+    return result;
+}
+const char *
 getTokenName(token_type_t tokenType)
 {
     const char *result = "UNKNOWN";
@@ -42,20 +72,8 @@ getTokenName(token_type_t tokenType)
             result = "NUMBER";
             break;
 
-        case PLUS:
-            result = "PLUS";
-            break;
-
-        case MINUS:
-            result = "MINUS";
-            break;
-
-        case TIMES:
-            result = "TIMES";
-            break;
-
-        case DIVIDE:
-            result = "DIVIDE";
+        case OPERATOR:
+            result = "OPERATOR";
             break;
 
         case LCURLY:
